@@ -68,11 +68,11 @@ namespace MobyLabWebProgramming.Backend.Controllers
         }
 
         /// <summary>
-        /// Removes an ingredient from a food item.
+        /// Removes a breed from a shelter.
         /// </summary>
         [Authorize]
         [HttpDelete("{shelterId:guid}/removeBreed/{breedId:guid}")]
-        public async Task<ActionResult<RequestResponse>> RemoveIngredientFromFood(Guid shelterId, Guid breedId)
+        public async Task<ActionResult<RequestResponse>> RemoveBreedFromShelter(Guid shelterId, Guid breedId)
         {
             var currentUser = await GetCurrentUser();
             if (currentUser.Result != null)

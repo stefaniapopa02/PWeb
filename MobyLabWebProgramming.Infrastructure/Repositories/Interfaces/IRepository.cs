@@ -20,6 +20,7 @@ public interface IRepository<out TDb> where TDb : DbContext
     /// Gets a single entity or null by the provided id.
     /// </summary>
     public Task<T?> GetAsync<T>(Guid id, CancellationToken cancellationToken = default) where T : BaseEntity;
+    public Task<T?> GetAsync<T>(Guid id, Func<IQueryable<T>, IQueryable<T>> include = null, CancellationToken cancellationToken = default) where T : BaseEntity;
     /// <summary>
     /// Gets a single entity or null using the specifications provided.
     /// </summary>

@@ -19,5 +19,6 @@ public enum ErrorCodes
     CannotDelete,
     MailSendFailed,
     ProfileAlreadyExistsForUser,
-    InvalidUserData
+    InvalidUserData,
+    EntityAlreadyExists
 }

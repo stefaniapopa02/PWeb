@@ -19,6 +19,17 @@ public sealed class Repository<TDb> : IRepository<TDb> where TDb : DbContext
 
     public async Task<T?> GetAsync<T>(Guid id, CancellationToken cancellationToken = default) where T : BaseEntity =>
         await DbContext.Set<T>().FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+    public async Task<T?> GetAsync<T>(Guid id, Func<IQueryable<T>, IQueryable<T>> include = null, CancellationToken cancellationToken = default) where T : BaseEntity
+    {
+        IQueryable<T> query = DbContext.Set<T>();
+
+        if (include != null)
+        {
+            query = include(query);
+        }
+
+        return await query.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+    }
 
     public async Task<T?> GetAsync<T>(ISpecification<T> spec, CancellationToken cancellationToken = default) where T : BaseEntity =>
         await new SpecificationEvaluator().GetQuery(DbContext.Set<T>().AsQueryable(), spec).FirstOrDefaultAsync(cancellationToken);

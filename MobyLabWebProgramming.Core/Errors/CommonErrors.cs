@@ -20,4 +20,8 @@ public static class CommonErrors
     public static ErrorMessage AdoptionHistoryNotFound => new(HttpStatusCode.NotFound, "AdoptionHistory doesn't exist!", ErrorCodes.EntityNotFound);
 
     public static ErrorMessage ProfileNotFound => new(HttpStatusCode.NotFound, "Profile doesn't exist!", ErrorCodes.EntityNotFound);
+
+    public static ErrorMessage BreedAlreadyExists => new(HttpStatusCode.Conflict, "Breed already exists!", ErrorCodes.EntityAlreadyExists);
+
+    public static ErrorMessage BreedNotInShelter => new(HttpStatusCode.Conflict, "Breed Not In Shelter!", ErrorCodes.EntityAlreadyExists);
 }

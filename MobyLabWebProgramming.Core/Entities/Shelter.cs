@@ -18,5 +18,7 @@ namespace MobyLabWebProgramming.Core.Entities
 
         public ICollection<Shelter_Breed> Shelter_Breeds { get; set; } = new List<Shelter_Breed>();
 
+        //public virtual ICollection<Shelter_Breed> Shelter_Breeds { get; set; } = new List<Shelter_Breed>();
+
     }
 }

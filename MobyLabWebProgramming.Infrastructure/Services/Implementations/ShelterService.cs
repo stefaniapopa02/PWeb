@@ -1,4 +1,5 @@
-﻿using MobyLabWebProgramming.Core.DataTransferObjects;
+﻿using Microsoft.EntityFrameworkCore;
+using MobyLabWebProgramming.Core.DataTransferObjects;
 using MobyLabWebProgramming.Core.Entities;
 using MobyLabWebProgramming.Core.Enums;
 using MobyLabWebProgramming.Core.Errors;
@@ -13,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MobyLabWebProgramming.Infrastructure.Services.Implementations
@@ -55,7 +57,7 @@ namespace MobyLabWebProgramming.Infrastructure.Services.Implementations
                 return ServiceResponse.FromError(new(HttpStatusCode.Forbidden, "Only the admin can add shelters!", ErrorCodes.CannotAdd));
             }
 
-            var result = await _repository.GetAsync(new ShelterProjectionSpec(shelter.Name), cancellationToken);
+            var result = await _repository.GetAsync(new ShelterProjectionSpec(shelter.Id), cancellationToken);
 
             if (result != null)
             {
@@ -79,7 +81,9 @@ namespace MobyLabWebProgramming.Infrastructure.Services.Implementations
 
         {
 
-            var shelter = await _repository.GetAsync<Shelter>(new ShelterProjectionSpec(shelterId));
+            var shelter = await _repository.GetAsync<Shelter>(shelterId, x => x.Include(s => s.Shelter_Breeds));
+
+           //  var shelter = await _repository.GetAsync<Shelter>(new ShelterProjectionSpec(shelterId));
 
             if (shelter == null)
 
@@ -91,7 +95,17 @@ namespace MobyLabWebProgramming.Infrastructure.Services.Implementations
 
                 return ServiceResponse.FromError(CommonErrors.BreedNotFound);
 
-            shelter.Shelter_Breeds.Add(new Shelter_Breed
+            if(shelter.Shelter_Breeds == null)
+            {
+                return ServiceResponse.FromError(CommonErrors.BreedAlreadyExists);
+            }
+
+            var shelter_breed = shelter.Shelter_Breeds.FirstOrDefault(i => i.ShelterId == shelterId && i.BreedId == breedId);
+            if(shelter_breed != null)
+                return ServiceResponse.FromError(CommonErrors.BreedAlreadyExists);
+           // return ServiceResponse.FromError(new(HttpStatusCode.Forbidden, "Only the admin can add shelters!", ErrorCodes.CannotAdd));
+
+           shelter.Shelter_Breeds.Add(new Shelter_Breed
 
             {
                 Shelter = shelter,
@@ -101,6 +115,13 @@ namespace MobyLabWebProgramming.Infrastructure.Services.Implementations
 
             });
 
+            if (shelter.Shelter_Breeds == null)
+            {
+                return ServiceResponse.FromError(CommonErrors.BreedAlreadyExists);
+            }
+            var shelter_breed1   = shelter.Shelter_Breeds.FirstOrDefault(i => i.ShelterId == shelterId && i.BreedId == breedId);
+            if (shelter_breed1 != null)
+                return ServiceResponse.FromError(CommonErrors.BreedAlreadyExists);
             await _repository.UpdateAsync(shelter);
 
             return ServiceResponse.ForSuccess();
@@ -127,7 +148,7 @@ namespace MobyLabWebProgramming.Infrastructure.Services.Implementations
 
             if (shelter_breed == null)
 
-                return ServiceResponse.FromError(CommonErrors.BreedNotFound);
+                return ServiceResponse.FromError(CommonErrors.BreedNotInShelter);
 
             shelter.Shelter_Breeds.Remove(shelter_breed);
 
